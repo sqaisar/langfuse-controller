@@ -28,6 +28,8 @@ spec:
           args:
           - --leader-elect
           env:
+            - name: WATCH_NAMESPACES
+              value: "{{ join \",\" .Values.watchNamespaces }}"
             - name: LANGFUSE_HOST
               value: {{ .Values.langfuse.host | quote }}
             - name: LANGFUSE_ADMIN_API_KEY

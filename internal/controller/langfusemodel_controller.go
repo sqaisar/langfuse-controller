@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	langfusev1alpha1 "github.com/sqaisar/langfuse-controller/api/v1alpha1"
@@ -106,6 +107,9 @@ func (r *LangfuseModelReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *LangfuseModelReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&langfusev1alpha1.LangfuseModel{}).
+		WithOptions(controller.Options{
+			MaxConcurrentReconciles: 1, // avoids event storms
+		}).
 		Named("langfusemodel").
 		Complete(r)
 }
