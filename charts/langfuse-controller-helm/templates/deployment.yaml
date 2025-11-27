@@ -32,11 +32,16 @@ spec:
               value: {{ join "," .Values.watchNamespaces | quote }}
             - name: LANGFUSE_HOST
               value: {{ .Values.langfuse.host | quote }}
-            - name: LANGFUSE_ADMIN_API_KEY
+            - name: LANGFUSE_PUBLIC_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.langfuse.existingSecret | default (include "langfuse-controller-helm.fullname" .) }}
-                  key: LANGFUSE_ADMIN_API_KEY
+                  key: LANGFUSE_PUBLIC_KEY
+            - name: LANGFUSE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.langfuse.existingSecret | default (include "langfuse-controller-helm.fullname" .) }}
+                  key: LANGFUSE_SECRET_KEY
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

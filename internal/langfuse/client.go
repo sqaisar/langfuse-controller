@@ -2,6 +2,7 @@ package langfuse
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,9 +11,10 @@ import (
 )
 
 type Client struct {
-	BaseURL string
-	Client  *http.Client
-	Token   string
+	BaseURL   string
+	Client    *http.Client
+	PublicKey string
+	SecretKey string
 }
 
 func NewClient() *Client {
@@ -20,17 +22,21 @@ func NewClient() *Client {
 	if baseURL == "" {
 		baseURL = "https://cloud.langfuse.com"
 	}
-	token := os.Getenv("LANGFUSE_ADMIN_API_KEY")
+	publicKey := os.Getenv("LANGFUSE_PUBLIC_KEY")
+	secretKey := os.Getenv("LANGFUSE_SECRET_KEY")
 
 	return &Client{
-		BaseURL: baseURL,
-		Client:  &http.Client{},
-		Token:   token,
+		BaseURL:   baseURL,
+		Client:    &http.Client{},
+		PublicKey: publicKey,
+		SecretKey: secretKey,
 	}
 }
 
 func (c *Client) do(req *http.Request, v interface{}) error {
-	req.Header.Set("Authorization", "Bearer "+c.Token)
+	// Use Basic Auth with public_key:secret_key base64 encoded
+	auth := base64.StdEncoding.EncodeToString([]byte(c.PublicKey + ":" + c.SecretKey))
+	req.Header.Set("Authorization", "Basic "+auth)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.Client.Do(req)

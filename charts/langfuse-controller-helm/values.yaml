@@ -48,5 +48,6 @@ affinity: {}
 
 langfuse:
   host: "https://cloud.langfuse.com"
-  # adminApiKey: "sk-..." # Optional: set here or use existing secret
-  existingSecret: "" # Name of existing secret with LANGFUSE_ADMIN_API_KEY
+  # publicKey: "pk-..." # Optional: set here or use existing secret
+  # secretKey: "sk-..." # Optional: set here or use existing secret
+  existingSecret: "" # Name of existing secret with LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY

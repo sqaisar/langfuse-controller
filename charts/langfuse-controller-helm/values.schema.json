@@ -266,14 +266,19 @@
           "description": "Langfuse API endpoint",
           "default": "https://cloud.langfuse.com"
         },
-        "adminApiKey": {
+        "publicKey": {
           "type": "string",
-          "description": "Langfuse Admin API key (optional if existingSecret is set)",
+          "description": "Langfuse Public API key (optional if existingSecret is set)",
+          "default": ""
+        },
+        "secretKey": {
+          "type": "string",
+          "description": "Langfuse Secret API key (optional if existingSecret is set)",
           "default": ""
         },
         "existingSecret": {
           "type": "string",
-          "description": "Name of existing secret containing LANGFUSE_ADMIN_API_KEY (optional if adminApiKey is set)",
+          "description": "Name of existing secret containing LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY (optional if publicKey and secretKey are set)",
           "default": ""
         }
       },

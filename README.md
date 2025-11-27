@@ -26,7 +26,7 @@ A Kubernetes operator for managing Langfuse resources via Custom Resource Defini
 
 - Kubernetes 1.28+
 - Helm 3.x
-- Langfuse Admin API key
+- Langfuse Public and Secret API keys
 
 ### Installation
 
@@ -34,7 +34,8 @@ A Kubernetes operator for managing Langfuse resources via Custom Resource Defini
 # Install via Helm
 helm install langfuse-controller ./charts/langfuse-controller-helm \\
   --set langfuse.host="https://cloud.langfuse.com" \\
-  --set langfuse.adminApiKey="your-admin-api-key"
+  --set langfuse.publicKey="pk-..." \\
+  --set langfuse.secretKey="sk-..."
 ```
 
 ### Example Usage
@@ -81,7 +82,8 @@ make build
 
 ```bash
 export LANGFUSE_HOST="https://cloud.langfuse.com"
-export LANGFUSE_ADMIN_API_KEY="your-key"
+export LANGFUSE_PUBLIC_KEY="pk-..."
+export LANGFUSE_SECRET_KEY="sk-..."
 make run
 ```
 
@@ -96,7 +98,8 @@ make manifests
 The controller is configured via environment variables:
 
 - `LANGFUSE_HOST` - Langfuse API endpoint (default: `https://cloud.langfuse.com`)
-- `LANGFUSE_ADMIN_API_KEY` - Admin API key for authentication
+- `LANGFUSE_PUBLIC_KEY` - Langfuse Public API key for authentication
+- `LANGFUSE_SECRET_KEY` - Langfuse Secret API key for authentication
 
 ## Architecture
 

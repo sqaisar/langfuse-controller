@@ -19,7 +19,7 @@ This chart deploys the Langfuse Kubernetes Controller, enabling you to manage La
 
 - Kubernetes 1.28+
 - Helm 3.x
-- Langfuse Admin API key
+- Langfuse Public and Secret API keys
 
 ## Installation
 
@@ -35,25 +35,27 @@ helm repo update
 ```bash
 helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="your-admin-api-key" \
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..." \
   --namespace langfuse-controller \
   --create-namespace
 ```
 
 ### Install using existing secret
 
-If you prefer to store the API key in a Kubernetes Secret:
+If you prefer to store the API keys in a Kubernetes Secret:
 
 ```bash
 # Create the secret
-kubectl create secret generic langfuse-admin-api-key \
-  --from-literal=LANGFUSE_ADMIN_API_KEY="your-admin-api-key" \
+kubectl create secret generic langfuse-api-keys \
+  --from-literal=LANGFUSE_PUBLIC_KEY="pk-..." \
+  --from-literal=LANGFUSE_SECRET_KEY="sk-..." \
   --namespace langfuse-controller
 
 # Install with existing secret
 helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.existingSecret="langfuse-admin-api-key" \
+  --set langfuse.existingSecret="langfuse-api-keys" \
   --namespace langfuse-controller \
   --create-namespace
 ```
@@ -85,8 +87,9 @@ The following table lists the configurable parameters and their default values:
 | `tolerations` | Tolerations | `[]` |
 | `affinity` | Affinity rules | `{}` |
 | `langfuse.host` | Langfuse API endpoint | `https://cloud.langfuse.com` |
-| `langfuse.adminApiKey` | Langfuse Admin API key | `""` |
-| `langfuse.existingSecret` | Name of existing secret with `LANGFUSE_ADMIN_API_KEY` | `""` |
+| `langfuse.publicKey` | Langfuse Public API key | `""` |
+| `langfuse.secretKey` | Langfuse Secret API key | `""` |
+| `langfuse.existingSecret` | Name of existing secret with `LANGFUSE_PUBLIC_KEY` and `LANGFUSE_SECRET_KEY` | `""` |
 
 ## Usage Examples
 
@@ -95,7 +98,8 @@ The following table lists the configurable parameters and their default values:
 ```bash
 helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="sk-..."
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..."
 ```
 
 ### Custom Image Tag
@@ -104,7 +108,8 @@ helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
 helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set image.tag="v0.1.0" \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="sk-..."
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..."
 ```
 
 ### Watch Specific Namespaces
@@ -114,7 +119,8 @@ helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set watchNamespaces[0]="default" \
   --set watchNamespaces[1]="production" \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="sk-..."
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..."
 ```
 
 ### Custom Resource Limits
@@ -126,7 +132,8 @@ helm install langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set resources.requests.cpu="100m" \
   --set resources.requests.memory="128Mi" \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="sk-..."
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..."
 ```
 
 ## Managing Langfuse Resources
@@ -176,7 +183,8 @@ The controller will automatically:
 ```bash
 helm upgrade langfuse-controller langfuse-controller/langfuse-controller-helm \
   --set langfuse.host="https://cloud.langfuse.com" \
-  --set langfuse.adminApiKey="your-admin-api-key"
+  --set langfuse.publicKey="pk-..." \
+  --set langfuse.secretKey="sk-..."
 ```
 
 ## Uninstallation
