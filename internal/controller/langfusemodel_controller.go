@@ -18,7 +18,9 @@ package controller
 
 import (
 	"context"
+	"strconv"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -26,8 +28,6 @@ import (
 
 	langfusev1alpha1 "github.com/sqaisar/langfuse-controller/api/v1alpha1"
 	"github.com/sqaisar/langfuse-controller/internal/langfuse"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strconv"
 )
 
 // LangfuseModelReconciler reconciles a LangfuseModel object
