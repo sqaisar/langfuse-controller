@@ -1,0 +1,23 @@
+# Artifact Hub repository metadata file for verified publisher status
+# 
+# SETUP INSTRUCTIONS:
+# 1. Get your Repository ID from Artifact Hub:
+#    - Go to https://artifacthub.io and log in
+#    - Navigate to the "Repositories" tab in your control panel
+#    - Find your Docker Hub OCI repository and note the "ID" shown on the repository card
+#    - Replace <your-repository-id-here> below with your actual repository ID
+#
+# 2. Push this file to Docker Hub OCI registry ONE TIME (it persists):
+#    - Install ORAS CLI: https://oras.land/docs/installation
+#    - Login to Docker Hub (use your Docker Hub access token as password):
+#      echo "YOUR_DOCKERHUB_TOKEN" | oras login docker.io -u YOUR_DOCKERHUB_USERNAME --password-stdin
+#    - Push the metadata file:
+#      oras push docker.io/sqaisar/langfuse-controller-helm:artifacthub.io \
+#        --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml \
+#        artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
+#
+# NOTE: Use your Docker Hub access token (not Artifact Hub password) for the login command.
+#       Create a token at: https://hub.docker.com/settings/security
+#
+repositoryID: c95e11a4-df2b-4d7e-b6f4-a49cbd3e6e86
+
