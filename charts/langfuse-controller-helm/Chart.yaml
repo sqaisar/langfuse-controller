@@ -1,6 +1,42 @@
 apiVersion: v2
 name: langfuse-controller-helm
-description: A Helm chart for Langfuse Kubernetes Controller
+description: Production-ready Helm chart for Langfuse Kubernetes Controller - manage Langfuse projects, API keys, models, prompts, and LLM connections via Kubernetes CRDs with GitOps support
+icon: "https://raw.githubusercontent.com/sqaisar/langfuse-controller/main/docs/logo.png"
+home: "https://github.com/sqaisar/langfuse-controller"
+sources:
+  - "https://github.com/sqaisar/langfuse-controller"
+maintainers:
+  - name: sqaisar
+    email: shababqaisar2@gmail.com
+    url: "https://github.com/sqaisar"
+annotations:
+  artifacthub.io/keywords: "langfuse,controller,operator,ai,observability,llm,langchain,kubernetes-operator,crd,gitops,monitoring,tracing"
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/logo: https://raw.githubusercontent.com/sqaisar/langfuse-controller/main/docs/logo.png
+  artifacthub.io/description: "Production-ready Helm chart for Langfuse Kubernetes Controller. Manage Langfuse projects, API keys, models, LLM connections, prompts, and score configurations via Kubernetes Custom Resource Definitions (CRDs). Features automatic reconciliation, secret management, GitOps support (ArgoCD, Flux), and seamless integration with Langfuse Admin API. Perfect for teams deploying AI/LLM observability and monitoring on Kubernetes."
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/sqaisar/langfuse-controller/blob/main/README.md
+    - name: Source Code
+      url: https://github.com/sqaisar/langfuse-controller
+keywords:
+  - langfuse
+  - controller
+  - kubernetes
+  - operator
+  - observability
+  - ai
+  - llm
+  - langchain
+  - kubernetes-operator
+  - crd
+  - gitops
+  - monitoring
+  - tracing
+  - helm
+  - argocd
+  - flux
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
