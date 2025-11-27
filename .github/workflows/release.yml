@@ -11,36 +11,34 @@ env:
   HELM_CHART_NAME: sqaisar/langfuse-controller-helm
 
 jobs:
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
+  build-images:
+    name: Build per-arch images
+    runs-on: ${{ matrix.runner }}
     permissions:
-      contents: write
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
           go-version-file: .go-version
           cache: true
 
-      - name: Run tests
+      - name: Run tests (only once on amd64)
+        if: matrix.arch == 'amd64'
         run: make test
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -53,27 +51,74 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{raw}}
-            type=sha
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Verify multi-arch manifest
+      - name: Build & push per-arch image
         run: |
-          echo "Verifying multi-arch manifest..."
-          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${GITHUB_REF#refs/tags/}
-          echo ""
-          echo "✅ Successfully pushed multi-arch image"
+          TAG="${{ steps.meta.outputs.version }}"
+          ARCH="${{ matrix.arch }}"
+          docker build \
+            --platform=linux/$ARCH \
+            -t $REGISTRY/$IMAGE_NAME:$TAG-$ARCH \
+            .
+          docker push $REGISTRY/$IMAGE_NAME:$TAG-$ARCH
 
-      - name: Get version (keep full vX.Y.Z)
+      - name: Upload image tag for manifest job
+        uses: actions/upload-artifact@v4
+        with:
+          name: tag-${{ matrix.arch }}
+          path: tag.txt
+        run: echo "${{ steps.meta.outputs.version }}" > tag.txt
+
+  manifest:
+    name: Create multi-arch manifest
+    needs: build-images
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: tag-amd64
+          path: .
+      - uses: actions/download-artifact@v4
+        with:
+          name: tag-arm64
+          path: .
+
+      - name: Read tag
+        id: tag
+        run: |
+          TAG=$(cat tag.txt)
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create & push manifest
+        run: |
+          TAG="${{ steps.tag.outputs.TAG }}"
+          docker manifest create $REGISTRY/$IMAGE_NAME:$TAG \
+            --amend $REGISTRY/$IMAGE_NAME:$TAG-amd64 \
+            --amend $REGISTRY/$IMAGE_NAME:$TAG-arm64
+
+          docker manifest push $REGISTRY/$IMAGE_NAME:$TAG
+
+  helm-release:
+    name: Helm + GitHub Release
+    needs: manifest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
@@ -85,16 +130,15 @@ jobs:
           sed -i "s/tag:.*/tag: \"${VERSION}\"/" charts/langfuse-controller/values.yaml
 
       - name: Package Helm chart
-        run: |
-          helm package charts/langfuse-controller
+        run: helm package charts/langfuse-controller
 
-      - name: Log in to Helm registry (Docker Hub)
+      - name: Log in to Helm registry
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | \
           helm registry login ${{ env.REGISTRY }} \
             -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Push Helm chart to Docker Hub
+      - name: Push Helm chart
         run: |
           CHART_VERSION=${{ steps.version.outputs.VERSION }}
           helm push langfuse-controller-${CHART_VERSION}.tgz \
@@ -131,7 +175,5 @@ jobs:
             ${{ steps.changelog.outputs.CHANGELOG }}
           files: |
             langfuse-controller-*.tgz
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
