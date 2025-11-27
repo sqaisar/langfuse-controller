@@ -45,6 +45,7 @@ help: ## Display this help.
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	"$(CONTROLLER_GEN)" rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 	$(MAKE) helm-sync-crds
+	$(MAKE) helm-sync-rbac
 
 .PHONY: helm-sync-crds
 helm-sync-crds: ## Sync generated CRDs to Helm chart directory
@@ -52,6 +53,11 @@ helm-sync-crds: ## Sync generated CRDs to Helm chart directory
 	@mkdir -p charts/langfuse-controller-helm/crds
 	@cp config/crd/bases/*.yaml charts/langfuse-controller-helm/crds/
 	@echo "CRDs synced successfully to charts/langfuse-controller-helm/crds/"
+
+.PHONY: helm-sync-rbac
+helm-sync-rbac: ## Sync generated RBAC to Helm chart directory
+	@echo "Syncing RBAC to Helm chart..."
+	@bash hack/sync-rbac-to-helm.sh
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
