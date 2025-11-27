@@ -11,8 +11,24 @@ env:
   HELM_CHART_NAME: sqaisar/langfuse-controller-helm
 
 jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+          cache: true
+
+      - name: Run tests
+        run: make test
+
   build-images:
     name: Build per-arch images
+    needs: test
     runs-on: ${{ matrix.runner }}
     permissions:
       packages: write
@@ -28,15 +44,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: .go-version
-          cache: true
-
-      - name: Run tests (only on amd64)
-        if: matrix.arch == 'amd64'
-        run: make test
 
       - uses: docker/login-action@v3
         with:
@@ -137,14 +144,12 @@ jobs:
       - name: Package Helm chart
         run: helm package charts/langfuse-controller
 
-      - name: Log in to Helm registry
+      - name: Log in to Helm registry and push chart
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | \
           helm registry login ${{ env.REGISTRY }} \
             -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-      - name: Push Helm chart
-        run: |
+          
           CHART_VERSION=${{ steps.version.outputs.VERSION }}
           helm push langfuse-controller-${CHART_VERSION}.tgz \
             oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }}
