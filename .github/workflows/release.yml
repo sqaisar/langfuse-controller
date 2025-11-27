@@ -158,7 +158,7 @@ jobs:
           
           CHART_VERSION=${{ steps.version.outputs.VERSION }}
           helm push langfuse-controller-${CHART_VERSION}.tgz \
-            oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }}
+            oci://${{ env.REGISTRY }}/${{ github.owner }}
 
       - name: Generate changelog
         id: changelog

@@ -2,6 +2,8 @@
 
 A Kubernetes operator for managing Langfuse resources via Custom Resource Definitions (CRDs).
 
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/langfuse-controller-helm)](https://artifacthub.io/packages/search?repo=langfuse-controller-helm)
+
 ## Features
 
 - **Declarative Management**: Manage Langfuse resources using Kubernetes manifests
