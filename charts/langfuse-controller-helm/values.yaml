@@ -1,12 +1,12 @@
 image:
-  repository: github.com/sqaisar/langfuse-controller
+  repository: sqaisar/langfuse-controller
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "langfuse-controller"
 
 watchNamespaces: []
 
