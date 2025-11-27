@@ -1,0 +1,32 @@
+name: Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+          cache: true
+
+      - name: Run tests
+        run: make test
+
+      - name: Build binary
+        run: make build
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./cover.out
+          fail_ci_if_error: false

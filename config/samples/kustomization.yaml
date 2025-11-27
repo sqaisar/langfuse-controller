@@ -1,0 +1,9 @@
+## Append samples of your project ##
+resources:
+- langfuse_v1alpha1_langfuseproject.yaml
+- langfuse_v1alpha1_langfuseapikey.yaml
+- langfuse_v1alpha1_langfusemodel.yaml
+- langfuse_v1alpha1_langfusellmconnection.yaml
+- langfuse_v1alpha1_langfuseprompt.yaml
+- langfuse_v1alpha1_langfusescoreconfig.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

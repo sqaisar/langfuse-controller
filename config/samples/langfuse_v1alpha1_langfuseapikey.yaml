@@ -1,0 +1,9 @@
+apiVersion: langfuse.io/v1alpha1
+kind: LangfuseAPIKey
+metadata:
+  labels:
+    app.kubernetes.io/name: langfuse-controller
+    app.kubernetes.io/managed-by: kustomize
+  name: langfuseapikey-sample
+spec:
+  # TODO(user): Add fields here
