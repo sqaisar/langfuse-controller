@@ -32,7 +32,7 @@ A Kubernetes operator for managing Langfuse resources via Custom Resource Defini
 
 ```bash
 # Install via Helm
-helm install langfuse-controller ./charts/langfuse-controller \\
+helm install langfuse-controller ./charts/langfuse-controller-helm \\
   --set langfuse.host="https://cloud.langfuse.com" \\
   --set langfuse.adminApiKey="your-admin-api-key"
 ```

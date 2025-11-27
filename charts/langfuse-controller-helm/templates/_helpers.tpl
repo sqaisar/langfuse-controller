@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "langfuse-controller.name" -}}
+{{- define "langfuse-controller-helm.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "langfuse-controller.fullname" -}}
+{{- define "langfuse-controller-helm.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "langfuse-controller.chart" -}}
+{{- define "langfuse-controller-helm.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "langfuse-controller.labels" -}}
-helm.sh/chart: {{ include "langfuse-controller.chart" . }}
-{{ include "langfuse-controller.selectorLabels" . }}
+{{- define "langfuse-controller-helm.labels" -}}
+helm.sh/chart: {{ include "langfuse-controller-helm.chart" . }}
+{{ include "langfuse-controller-helm.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "langfuse-controller.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "langfuse-controller.name" . }}
+{{- define "langfuse-controller-helm.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "langfuse-controller-helm.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "langfuse-controller.serviceAccountName" -}}
+{{- define "langfuse-controller-helm.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "langfuse-controller.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "langfuse-controller-helm.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

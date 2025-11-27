@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "langfuse-controller.fullname" . }}
+  name: {{ include "langfuse-controller-helm.fullname" . }}
   labels:
-    {{- include "langfuse-controller.labels" . | nindent 4 }}
+    {{- include "langfuse-controller-helm.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "langfuse-controller.selectorLabels" . | nindent 6 }}
+      {{- include "langfuse-controller-helm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "langfuse-controller.selectorLabels" . | nindent 8 }}
+        {{- include "langfuse-controller-helm.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "langfuse-controller.serviceAccountName" . }}
+      serviceAccountName: {{ include "langfuse-controller-helm.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -29,13 +29,13 @@ spec:
           - --leader-elect
           env:
             - name: WATCH_NAMESPACES
-              value: "{{ join \",\" .Values.watchNamespaces }}"
+              value: {{ join "," .Values.watchNamespaces | quote }}
             - name: LANGFUSE_HOST
               value: {{ .Values.langfuse.host | quote }}
             - name: LANGFUSE_ADMIN_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.langfuse.existingSecret | default (include "langfuse-controller.fullname" .) }}
+                  name: {{ .Values.langfuse.existingSecret | default (include "langfuse-controller-helm.fullname" .) }}
                   key: LANGFUSE_ADMIN_API_KEY
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

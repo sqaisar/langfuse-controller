@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: sqaisar/langfuse-controller
-  HELM_CHART_NAME: sqaisar/langfuse-controller-helm
+  HELM_CHART_NAME: sqaisar
 
 jobs:
   test:
@@ -137,12 +137,12 @@ jobs:
       - name: Update Helm Chart version
         run: |
           VERSION=${{ steps.version.outputs.VERSION }}
-          sed -i "s/^version:.*/version: ${VERSION}/" charts/langfuse-controller/Chart.yaml
-          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" charts/langfuse-controller/Chart.yaml
-          sed -i "s/tag:.*/tag: \"${VERSION}\"/" charts/langfuse-controller/values.yaml
+          sed -i "s/^version:.*/version: ${VERSION}/" charts/langfuse-controller-helm/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: \"${VERSION}\"/" charts/langfuse-controller-helm/Chart.yaml
+          sed -i "s/tag:.*/tag: \"${VERSION}\"/" charts/langfuse-controller-helm/values.yaml
 
       - name: Package Helm chart
-        run: helm package charts/langfuse-controller
+        run: helm package charts/langfuse-controller-helm
 
       - uses: docker/login-action@v3
         with:
@@ -152,13 +152,18 @@ jobs:
 
       - name: Log in to Helm registry and push chart
         run: |
+          # Use registry-1.docker.io for Helm (Docker Hub's registry endpoint)
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | \
-          helm registry login ${{ env.REGISTRY }} \
+          helm registry login registry-1.docker.io \
             -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
           
           CHART_VERSION=${{ steps.version.outputs.VERSION }}
-          helm push langfuse-controller-${CHART_VERSION}.tgz \
-            oci://${{ env.REGISTRY }}/${{ github.owner }}
+          echo "Pushing chart version: ${CHART_VERSION}"
+          echo "Chart file: langfuse-controller-helm-${CHART_VERSION}.tgz"
+          echo "OCI path: oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }}"
+          
+          helm push langfuse-controller-helm-${CHART_VERSION}.tgz \
+            oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }}
 
       - name: Generate changelog
         id: changelog
@@ -184,12 +189,12 @@ jobs:
 
             ## Helm Chart
             ```bash
-            helm install langfuse-controller oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }} --version ${{ steps.version.outputs.VERSION }}
+            helm install langfuse-controller oci://${{ env.REGISTRY }}/${{ env.HELM_CHART_NAME }}/langfuse-controller-helm --version ${{ steps.version.outputs.VERSION }}
             ```
 
             ## Changes
             ${{ steps.changelog.outputs.CHANGELOG }}
           files: |
-            langfuse-controller-*.tgz
+            langfuse-controller-helm-*.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

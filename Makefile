@@ -49,9 +49,9 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 .PHONY: helm-sync-crds
 helm-sync-crds: ## Sync generated CRDs to Helm chart directory
 	@echo "Syncing CRDs to Helm chart..."
-	@mkdir -p charts/langfuse-controller/crds
-	@cp config/crd/bases/*.yaml charts/langfuse-controller/crds/
-	@echo "CRDs synced successfully to charts/langfuse-controller/crds/"
+	@mkdir -p charts/langfuse-controller-helm/crds
+	@cp config/crd/bases/*.yaml charts/langfuse-controller-helm/crds/
+	@echo "CRDs synced successfully to charts/langfuse-controller-helm/crds/"
 
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
