@@ -34,7 +34,7 @@ jobs:
           go-version-file: .go-version
           cache: true
 
-      - name: Run tests (only once on amd64)
+      - name: Run tests (only on amd64)
         if: matrix.arch == 'amd64'
         run: make test
 
@@ -62,12 +62,15 @@ jobs:
             .
           docker push $REGISTRY/$IMAGE_NAME:$TAG-$ARCH
 
-      - name: Upload image tag for manifest job
+      # FIX: split into 2 steps
+      - name: Write tag file
+        run: echo "${{ steps.meta.outputs.version }}" > tag.txt
+
+      - name: Upload tag file for manifest job
         uses: actions/upload-artifact@v4
         with:
           name: tag-${{ matrix.arch }}
           path: tag.txt
-        run: echo "${{ steps.meta.outputs.version }}" > tag.txt
 
   manifest:
     name: Create multi-arch manifest
@@ -78,16 +81,17 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: tag-amd64
-          path: .
+          path: amd64
+
       - uses: actions/download-artifact@v4
         with:
           name: tag-arm64
-          path: .
+          path: arm64
 
-      - name: Read tag
+      - name: Read version tag
         id: tag
         run: |
-          TAG=$(cat tag.txt)
+          TAG=$(cat amd64/tag.txt)
           echo "TAG=$TAG" >> $GITHUB_OUTPUT
 
       - uses: docker/login-action@v3
@@ -99,6 +103,7 @@ jobs:
       - name: Create & push manifest
         run: |
           TAG="${{ steps.tag.outputs.TAG }}"
+
           docker manifest create $REGISTRY/$IMAGE_NAME:$TAG \
             --amend $REGISTRY/$IMAGE_NAME:$TAG-amd64 \
             --amend $REGISTRY/$IMAGE_NAME:$TAG-arm64
